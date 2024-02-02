@@ -6,7 +6,7 @@ const Movie = (props) => {
             {props.year}
             <br />
             <span>Cast: </span>
-            <ul style={{"list-style": "none"}}>
+            <ul>
                 <li>{props.cast[0]}</li>
                 <li>{props.cast[1]}</li>
             </ul>
