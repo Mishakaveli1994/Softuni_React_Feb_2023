@@ -32,13 +32,28 @@ function App() {
 
         const createdUser = await userService.createUser(data);
 
-        setUsers(state => [createdUser, ...users]);
-
+        setUsers((state) => [createdUser, ...users]);
     };
 
-    const onUserDelete = async (id) => {
-        console.log(id)
-    }
+    const onUserUpdateSubmit = async (e, userId) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.currentTarget);
+
+        const data = Object.fromEntries(formData);
+
+        const createdUser = await userService.updateUser(userId, data);
+
+        setUsers((state) =>
+            state.map((u) => (u._id === userId ? createdUser : u))
+        );
+    };
+
+    const onUserDelete = async (userId) => {
+        await userService.deleteUser(userId);
+
+        setUsers((state) => state.filter((u) => u._id !== userId));
+    };
 
     // ? Better way
     useEffect(() => {
@@ -66,7 +81,12 @@ function App() {
                     <Search />
 
                     {/* <!-- Table component --> */}
-                    <UserList users={users} onUserCreateSubmit={onUserCreateSubmit} onUserDelete={onUserDelete} />
+                    <UserList
+                        users={users}
+                        onUserCreateSubmit={onUserCreateSubmit}
+                        onUserDelete={onUserDelete}
+                        onUserUpdateSubmit={onUserUpdateSubmit}
+                    />
 
                     {/* <!-- Pagination component  --> */}
                     <Pagination />

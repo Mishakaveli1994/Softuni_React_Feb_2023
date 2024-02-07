@@ -2,13 +2,19 @@ import { User } from './User';
 import { useState } from 'react';
 import { UserDetails } from './UserDetails';
 import * as userService from '../services/userService';
-import { CreateUser } from './CreateUser.js';
+import { SaveUser } from './SaveUser.js';
 import { DeleteUser } from './DeleteUser.js';
 
-export const UserList = ({ users, onUserCreateSubmit, onUserDelete }) => {
+export const UserList = ({
+    users,
+    onUserCreateSubmit,
+    onUserDelete,
+    onUserUpdateSubmit
+}) => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [showAddUser, setShowAddUser] = useState(false); // TODO: use one state and just pass what kind of action is taken - details, add, delete, edit
-    const [showDeleteUser, setShowDeleteUser] = useState(false);
+    const [showDeleteUser, setShowDeleteUser] = useState(null);
+    const [showEditUser, setShowEditUser] = useState(false);
 
     const onInfoClick = async (userId) => {
         const user = await userService.getOne(userId);
@@ -25,7 +31,8 @@ export const UserList = ({ users, onUserCreateSubmit, onUserDelete }) => {
         // TODO: Split
         setSelectedUser(null);
         setShowAddUser(false);
-        setShowDeleteUser(false);
+        setShowDeleteUser(null);
+        setShowEditUser(null);
     };
 
     const onUserCreateSubmitHandler = (e) => {
@@ -33,17 +40,48 @@ export const UserList = ({ users, onUserCreateSubmit, onUserDelete }) => {
         setShowAddUser(false);
     };
 
-    const onDeleteClick = async (userId) => {
-        setSelectedUser({ _id: userId }); // WONT WORK - as this also displays the details of the user
-        setShowDeleteUser(true);
+    const onUserUpdateSubmitHandler = (e, userId) => {
+        onUserUpdateSubmit(e, userId);
+        setShowEditUser(false);
     };
 
+
+    const onDeleteClick = (userId) => {
+        setShowDeleteUser(userId);
+    };
+
+    const onDeleteHandler = () => {
+        onUserDelete(showDeleteUser);
+        onCLose();
+    };
+
+    const onEditClick = async (userId) => {
+        const user = await userService.getOne(userId);
+        setShowEditUser(user);
+    };
+    // ! Change the component names to something more meaningful, also unify names
     return (
         <>
             {/* <!-- User details component  --> */}
-            {selectedUser && <UserDetails {...selectedUser} onClose={onCLose} />}
-            {showAddUser && <CreateUser onClose={onCLose} onUserCreateSubmit={onUserCreateSubmitHandler} />}
-            {showDeleteUser && <DeleteUser onClose={onCLose} onDelete={() => onUserDelete(setSelectedUser._id)} />}
+            {selectedUser && (
+                <UserDetails {...selectedUser} onClose={onCLose} />
+            )}
+            {showAddUser && (
+                <SaveUser
+                    onClose={onCLose}
+                    onUserCreateSubmit={onUserCreateSubmitHandler}
+                />
+            )}
+            {showDeleteUser && (
+                <DeleteUser onClose={onCLose} onDelete={onDeleteHandler} />
+            )}
+            {showEditUser && (
+                <SaveUser
+                    onClose={onCLose}
+                    user={showEditUser}
+                    onUserCreateSubmit={onUserUpdateSubmitHandler}
+                />
+            )}
             <div className="table-wrapper">
                 {/* <!-- Overlap components  --> */}
 
@@ -209,7 +247,13 @@ export const UserList = ({ users, onUserCreateSubmit, onUserDelete }) => {
                     <tbody>
                         {/* <!-- Table row component --> */}
                         {users.map((u) => (
-                            <User {...u} key={u._id} onInfoClick={onInfoClick} onDeleteClick={onDeleteClick} />
+                            <User
+                                {...u}
+                                key={u._id}
+                                onInfoClick={onInfoClick}
+                                onDeleteClick={onDeleteClick}
+                                onEditClick={onEditClick}
+                            />
                         ))}
                     </tbody>
                 </table>

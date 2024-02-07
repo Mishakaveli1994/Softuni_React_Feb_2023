@@ -1,6 +1,6 @@
 import { formatDate } from '../utils/dateUtils';
 
-export const User = ({ _id, firstName, lastName, email, imageUrl, createdAt, phoneNumber, onInfoClick, onDeleteClick }) => {
+export const User = ({ _id, firstName, lastName, email, imageUrl, createdAt, phoneNumber, onInfoClick, onDeleteClick, onEditClick }) => {
     return (
         <tr>
             <td>
@@ -13,7 +13,7 @@ export const User = ({ _id, firstName, lastName, email, imageUrl, createdAt, pho
             <td>{formatDate(createdAt)}</td>
 
             <td className="actions">
-                <button className="btn edit-btn" title="Edit">
+                <button className="btn edit-btn" title="Edit" onClick={() => onEditClick(_id)}>
                     <svg
                         aria-hidden="true"
                         focusable="false"
