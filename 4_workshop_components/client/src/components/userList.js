@@ -4,157 +4,112 @@ import { UserDetails } from './UserDetails';
 import * as userService from '../services/userService';
 import { SaveUser } from './SaveUser.js';
 import { DeleteUser } from './DeleteUser.js';
+import { Spinner } from './Spinner.js';
+import { NoUsers } from './NoUsers.js';
+import { FetchError } from './FetchError';
 
 export const UserList = ({
     users,
+    onUserInfo,
     onUserCreateSubmit,
     onUserDelete,
-    onUserUpdateSubmit
+    onUserUpdateSubmit,
+    activeQuery,
+    fetchError,
+    query,
+    setQuery,
+    sortHandler
 }) => {
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [showAddUser, setShowAddUser] = useState(false); // TODO: use one state and just pass what kind of action is taken - details, add, delete, edit
-    const [showDeleteUser, setShowDeleteUser] = useState(null);
-    const [showEditUser, setShowEditUser] = useState(false);
+    const [pageAction, setPageAction] = useState({ action: null });
+
+    const onSortClick = (field) => {
+        let currentSort = { ...query };
+        currentSort.sort = field;
+        currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
+        setQuery(currentSort);
+        sortHandler()
+    };
 
     const onInfoClick = async (userId) => {
-        const user = await userService.getOne(userId);
-        if (user) {
-            setSelectedUser(user);
-        }
+        const user = await onUserInfo(userId);
+        setPageAction({ action: 'info', user });
     };
 
     const onUserAddClick = () => {
-        setShowAddUser(true);
+        setPageAction({ action: 'add' });
     };
 
     const onCLose = () => {
-        // TODO: Split
-        setSelectedUser(null);
-        setShowAddUser(false);
-        setShowDeleteUser(null);
-        setShowEditUser(null);
+        setPageAction({ action: null });
     };
 
     const onUserCreateSubmitHandler = (e) => {
         onUserCreateSubmit(e);
-        setShowAddUser(false);
+        setPageAction({ action: null });
     };
 
     const onUserUpdateSubmitHandler = (e, userId) => {
         onUserUpdateSubmit(e, userId);
-        setShowEditUser(false);
+        setPageAction({ action: null });
     };
 
-
     const onDeleteClick = (userId) => {
-        setShowDeleteUser(userId);
+        setPageAction({ action: 'delete', userId });
     };
 
     const onDeleteHandler = () => {
-        onUserDelete(showDeleteUser);
+        onUserDelete(pageAction.userId);
         onCLose();
     };
 
     const onEditClick = async (userId) => {
         const user = await userService.getOne(userId);
-        setShowEditUser(user);
+        setPageAction({ action: 'edit', user });
     };
-    // ! Change the component names to something more meaningful, also unify names
+
     return (
         <>
             {/* <!-- User details component  --> */}
-            {selectedUser && (
-                <UserDetails {...selectedUser} onClose={onCLose} />
+            {!fetchError && pageAction.action === 'info' && (
+                <UserDetails {...pageAction.user} onClose={onCLose} />
             )}
-            {showAddUser && (
+            {!fetchError && pageAction.action === 'add' && (
                 <SaveUser
                     onClose={onCLose}
                     onUserCreateSubmit={onUserCreateSubmitHandler}
                 />
             )}
-            {showDeleteUser && (
+            {!fetchError && pageAction.action === 'delete' && (
                 <DeleteUser onClose={onCLose} onDelete={onDeleteHandler} />
             )}
-            {showEditUser && (
+            {!fetchError && pageAction.action === 'edit' && (
                 <SaveUser
                     onClose={onCLose}
-                    user={showEditUser}
+                    user={pageAction.user}
                     onUserCreateSubmit={onUserUpdateSubmitHandler}
                 />
             )}
             <div className="table-wrapper">
-                {/* <!-- Overlap components  --> */}
-
-                {/* <div className="loading-shade"> */}
-                {/* <!-- Loading spinner  --> */}
-                {/* <div className="spinner"></div> */}
-                {/* <!-- No users added yet  --> */}
-                {/* <div className="table-overlap">
-                    <svg
-                        aria-hidden="true"
-                        focusable="false"
-                        data-prefix="fas"
-                        data-icon="triangle-exclamation"
-                        className="svg-inline--fa fa-triangle-exclamation Table_icon__+HHgn"
-                        role="img"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 512 512"
-                    >
-                        <path
-                            fill="currentColor"
-                            d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"
-                        ></path>
-                    </svg>
-                    <h2>There is no users yet.</h2>
-                </div>{' '} */}
-                {/* <!-- No content overlap component  --> */}
-                {/* <div className="table-overlap">
-                    <svg
-                        aria-hidden="true"
-                        focusable="false"
-                        data-prefix="fas"
-                        data-icon="triangle-exclamation"
-                        className="svg-inline--fa fa-triangle-exclamation Table_icon__+HHgn"
-                        role="img"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 512 512"
-                    >
-                        <path
-                            fill="currentColor"
-                            d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"
-                        ></path>
-                    </svg>
-                    <h2>Sorry, we couldn't find what you're looking for.</h2>
-                </div> */}
-                {/* <!-- On error overlap component  --> */}
-                {/* <div className="table-overlap">
-                    <svg
-                        aria-hidden="true"
-                        focusable="false"
-                        data-prefix="fas"
-                        data-icon="triangle-exclamation"
-                        className="svg-inline--fa fa-triangle-exclamation Table_icon__+HHgn"
-                        role="img"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 512 512"
-                    >
-                        <path
-                            fill="currentColor"
-                            d="M506.3 417l-213.3-364c-16.33-28-57.54-28-73.98 0l-213.2 364C-10.59 444.9 9.849 480 42.74 480h426.6C502.1 480 522.6 445 506.3 417zM232 168c0-13.25 10.75-24 24-24S280 154.8 280 168v128c0 13.25-10.75 24-23.1 24S232 309.3 232 296V168zM256 416c-17.36 0-31.44-14.08-31.44-31.44c0-17.36 14.07-31.44 31.44-31.44s31.44 14.08 31.44 31.44C287.4 401.9 273.4 416 256 416z"
-                        ></path>
-                    </svg>
-                    <h2>Failed to fetch</h2>
-                </div> */}
-                {/* </div> */}
-
+                {!fetchError && users.length === 0 && !activeQuery && (
+                    <NoUsers />
+                )}
+                {fetchError && <FetchError />}
+                {activeQuery && <Spinner />}
                 <table className="table">
                     <thead>
                         <tr>
                             <th>Image</th>
-                            <th>
+                            <th onClick={() => onSortClick('firstName')}>
                                 First name
                                 <svg
-                                    className="icon svg-inline--fa fa-arrow-down Table_icon__+HHgn"
+                                    transform={`rotate(${
+                                        query.order === 'asc' ? 180 : 0
+                                    })`}
+                                    className={`icon svg-inline--fa fa-arrow-down Table_icon__+HHgn ${
+                                        query.field === 'firstName'
+                                            ? 'active-icon'
+                                            : ''
+                                    }`.trim()}
                                     aria-hidden="true"
                                     focusable="false"
                                     data-prefix="fas"
@@ -169,10 +124,17 @@ export const UserList = ({
                                     ></path>
                                 </svg>
                             </th>
-                            <th>
+                            <th onClick={() => onSortClick('lastName')}>
                                 Last name
                                 <svg
-                                    className="icon svg-inline--fa fa-arrow-down Table_icon__+HHgn"
+                                    transform={`rotate(${
+                                        query.order === 'asc' ? 180 : 0
+                                    })`}
+                                    className={`icon svg-inline--fa fa-arrow-down Table_icon__+HHgn ${
+                                        query.field === 'lastName'
+                                            ? 'active-icon'
+                                            : ''
+                                    }`.trim()}
                                     aria-hidden="true"
                                     focusable="false"
                                     data-prefix="fas"
@@ -187,10 +149,17 @@ export const UserList = ({
                                     ></path>
                                 </svg>
                             </th>
-                            <th>
+                            <th onClick={() => onSortClick('email')}>
                                 Email
                                 <svg
-                                    className="icon svg-inline--fa fa-arrow-down Table_icon__+HHgn"
+                                    transform={`rotate(${
+                                        query.order === 'asc' ? 180 : 0
+                                    })`}
+                                    className={`icon svg-inline--fa fa-arrow-down Table_icon__+HHgn ${
+                                        query.field === 'email'
+                                            ? 'active-icon'
+                                            : ''
+                                    }`.trim()}
                                     aria-hidden="true"
                                     focusable="false"
                                     data-prefix="fas"
@@ -205,10 +174,17 @@ export const UserList = ({
                                     ></path>
                                 </svg>
                             </th>
-                            <th>
+                            <th onClick={() => onSortClick('phone')}>
                                 Phone
                                 <svg
-                                    className="icon svg-inline--fa fa-arrow-down Table_icon__+HHgn"
+                                    transform={`rotate(${
+                                        query.order === 'asc' ? 180 : 0
+                                    })`}
+                                    className={`icon svg-inline--fa fa-arrow-down Table_icon__+HHgn ${
+                                        query.field === 'phone'
+                                            ? 'active-icon'
+                                            : ''
+                                    }`.trim()}
                                     aria-hidden="true"
                                     focusable="false"
                                     data-prefix="fas"
@@ -223,10 +199,17 @@ export const UserList = ({
                                     ></path>
                                 </svg>
                             </th>
-                            <th>
+                            <th onClick={() => onSortClick('created')}>
                                 Created
                                 <svg
-                                    className="icon active-icon svg-inline--fa fa-arrow-down Table_icon__+HHgn"
+                                    transform={`rotate(${
+                                        query.order === 'asc' ? 180 : 0
+                                    })`}
+                                    className={`icon svg-inline--fa fa-arrow-down Table_icon__+HHgn ${
+                                        query.field === 'created'
+                                            ? 'active-icon'
+                                            : ''
+                                    }`.trim()}
                                     aria-hidden="true"
                                     focusable="false"
                                     data-prefix="fas"
@@ -246,15 +229,16 @@ export const UserList = ({
                     </thead>
                     <tbody>
                         {/* <!-- Table row component --> */}
-                        {users.map((u) => (
-                            <User
-                                {...u}
-                                key={u._id}
-                                onInfoClick={onInfoClick}
-                                onDeleteClick={onDeleteClick}
-                                onEditClick={onEditClick}
-                            />
-                        ))}
+                        {!fetchError &&
+                            users.map((u) => (
+                                <User
+                                    {...u}
+                                    key={u._id}
+                                    onInfoClick={onInfoClick}
+                                    onDeleteClick={onDeleteClick}
+                                    onEditClick={onEditClick}
+                                />
+                            ))}
                     </tbody>
                 </table>
             </div>

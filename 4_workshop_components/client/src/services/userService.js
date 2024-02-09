@@ -1,17 +1,52 @@
 const baseUrl = 'http://localhost:3005/api/users';
+export const getAll = async ({
+    sort,
+    order,
+    search,
+    criteria,
+    limit,
+    page
+}) => {
+    let query = `${baseUrl}?`;
 
-export const getAll = async () => {
-    const response = await fetch(baseUrl);
-    const result = await response.json();
+    if (sort) {
+        query += `sort=${sort}&`;
+    }
+    if (order) {
+        query += `order=${order}&`;
+    }
+    if (criteria && search) {
+        query += `criteria=${criteria}&`;
+        query += `search=${search}&`;
+    }
+    if (limit) {
+        query += `limit=${limit}&`;
+    }
+    if (page) {
+        query += `page=${page}&`;
+    }
+    const response = await fetch(query);
 
-    return result.users;
+    if (response.ok) {
+        let result = await response.json();
+        result.pages = Math.ceil(result.count / limit);
+
+        return result;
+    } else {
+        throw new Error(await response.json());
+    }
 };
 
 export const getOne = async (userId) => {
     const response = await fetch(`${baseUrl}/${userId}`);
-    const result = await response.json();
 
-    return result.user;
+    if (response.ok) {
+        const result = await response.json();
+
+        return result.user;
+    } else {
+        throw new Error(await response.json());
+    }
 };
 
 export const createUser = async (userData) => {
@@ -22,10 +57,13 @@ export const createUser = async (userData) => {
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' }
     });
+    if (response.ok) {
+        const result = await response.json();
 
-    const result = await response.json();
-
-    return result.user;
+        return result.user;
+    } else {
+        throw new Error(await response.json());
+    }
 };
 
 export const updateUser = async (userId, userData) => {
@@ -37,15 +75,23 @@ export const updateUser = async (userId, userData) => {
         headers: { 'Content-Type': 'application/json' }
     });
 
-    const result = await response.json();
+    if (response.ok) {
+        const result = await response.json();
 
-    return result.user;
+        return result.user;
+    } else {
+        throw new Error(await response.json());
+    }
 };
 
 export const deleteUser = async (userId) => {
     const response = await fetch(`${baseUrl}/${userId}`, { method: 'DELETE' });
 
-    const result = await response.json();
+    if (response.ok) {
+        const result = await response.json();
 
-    return result;
+        return result;
+    } else {
+        throw new Error(await response.json());
+    }
 };

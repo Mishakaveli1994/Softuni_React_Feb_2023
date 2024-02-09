@@ -1,4 +1,27 @@
-export const Search = () => {
+export const Search = ({ query, setQuery, searchHandler }) => {
+    const changeSearchBar = (event) => {
+        let currentQuery = { ...query };
+        currentQuery.search = event.target.value;
+        setQuery(currentQuery);
+    };
+
+    const clearSearchBar = () => {
+        let currentQuery = { ...query };
+        currentQuery.search = '';
+        setQuery(currentQuery);
+    };
+
+    const onSearchClick = (e) => {
+        e.preventDefault();
+        searchHandler();
+    };
+
+    const changeSearchCriteria = (event) => {
+        let currentQuery = { ...query };
+        currentQuery.criteria = event.target.value;
+        setQuery(currentQuery);
+    };
+
     return (
         <form className="search-form">
             <h2>
@@ -20,25 +43,44 @@ export const Search = () => {
                 <span>Users</span>
             </h2>
             <div className="search-input-container">
-                <input type="text" placeholder="Please, select the search criteria" name="search" />
+                <input
+                    type="text"
+                    placeholder="Please, select the search criteria"
+                    name="search"
+                    value={query.search}
+                    onInput={changeSearchBar}
+                />
                 {/* <!-- Show the clear button only if input field length !== 0 --> */}
-                <button className="btn close-btn">
-                    <i className="fa-solid fa-xmark"></i>
-                </button>
+                {query.search && (
+                    <button
+                        className="btn close-btn"
+                        onClick={(e) => clearSearchBar(e)}
+                    >
+                        <i className="fa-solid fa-xmark"></i>
+                    </button>
+                )}
 
-                <button className="btn" title="Please, select the search criteria">
+                <button
+                    onClick={(e) => onSearchClick(e)}
+                    className="btn"
+                    title="Please, select the search criteria"
+                >
                     <i className="fa-solid fa-magnifying-glass"></i>
                 </button>
             </div>
 
             <div className="filter">
                 <span>Search Criteria:</span>
-                <select name="criteria" className="criteria">
+                <select
+                    name="criteria"
+                    className="criteria"
+                    onChange={changeSearchCriteria}
+                >
                     <option value="">Not selected</option>
-                    <option value="">First Name</option>
-                    <option value="">Last Name</option>
-                    <option value="">Email</option>
-                    <option value="">Phone</option>
+                    <option value="firstName">First Name</option>
+                    <option value="lastName">Last Name</option>
+                    <option value="email">Email</option>
+                    <option value="phoneNumber">Phone</option>
                 </select>
             </div>
         </form>

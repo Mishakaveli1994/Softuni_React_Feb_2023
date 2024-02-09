@@ -1,4 +1,19 @@
+import { useState } from 'react';
+import * as FormValidations from '../utils/validations';
+
 export const SaveUser = ({ user, onClose, onUserCreateSubmit }) => {
+    const [error, setError] = useState({
+        firstName: !user ? ['First name is required'] : [],
+        lastName: !user ? ['Last name is required'] : [],
+        email: !user ? ['Email is required'] : [],
+        imageUrl: !user ? ['Image URL is required'] : [],
+        phoneNumber: !user ? ['Phone number is required'] : [],
+        country: !user ? ['Country is required'] : [],
+        city: !user ? ['City is required'] : [],
+        street: !user ? ['Street is required'] : [],
+        streetNumber: !user ? ['Street number is required'] : []
+    });
+
     return (
         <div className="overlay">
             <div className="backdrop"></div>
@@ -37,12 +52,22 @@ export const SaveUser = ({ user, onClose, onUserCreateSubmit }) => {
                                         name="firstName"
                                         type="text"
                                         defaultValue={user?.firstName}
+                                        onChange={(e) =>
+                                            FormValidations.validateFirstName(
+                                                e.target.value,
+                                                setError
+                                            )
+                                        }
+                                        // onBlur={(e) =>
+                                        //     validateFirstName(e.target.value)
+                                        // }
                                     />
                                 </div>
-                                <p className="form-error">
-                                    First name should be at least 3 characters
-                                    long!
-                                </p>
+                                {error.firstName && (
+                                    <p className="form-error">
+                                        {error.firstName}
+                                    </p>
+                                )}
                             </div>
                             <div className="form-group">
                                 <label htmlFor="lastName">Last name</label>
@@ -55,12 +80,19 @@ export const SaveUser = ({ user, onClose, onUserCreateSubmit }) => {
                                         name="lastName"
                                         type="text"
                                         defaultValue={user?.lastName}
+                                        onChange={(e) =>
+                                            FormValidations.validateLastName(
+                                                e.target.value,
+                                                setError
+                                            )
+                                        }
                                     />
                                 </div>
-                                <p className="form-error">
-                                    Last name should be at least 3 characters
-                                    long!
-                                </p>
+                                {error.lastName && (
+                                    <p className="form-error">
+                                        {error.lastName}
+                                    </p>
+                                )}
                             </div>
                         </div>
 
@@ -76,11 +108,17 @@ export const SaveUser = ({ user, onClose, onUserCreateSubmit }) => {
                                         name="email"
                                         type="text"
                                         defaultValue={user?.email}
+                                        onChange={(e) =>
+                                            FormValidations.validateEmail(
+                                                e.target.value,
+                                                setError
+                                            )
+                                        }
                                     />
                                 </div>
-                                <p className="form-error">
-                                    Email is not valid!
-                                </p>
+                                {error.email && (
+                                    <p className="form-error">{error.email}</p>
+                                )}
                             </div>
                             <div className="form-group">
                                 <label htmlFor="phoneNumber">
@@ -95,11 +133,19 @@ export const SaveUser = ({ user, onClose, onUserCreateSubmit }) => {
                                         name="phoneNumber"
                                         type="text"
                                         defaultValue={user?.phoneNumber}
+                                        onChange={(e) =>
+                                            FormValidations.validatePhoneNumber(
+                                                e.target.value,
+                                                setError
+                                            )
+                                        }
                                     />
                                 </div>
-                                <p className="form-error">
-                                    Phone number is not valid!
-                                </p>
+                                {error.phoneNumber && (
+                                    <p className="form-error">
+                                        {error.phoneNumber}
+                                    </p>
+                                )}
                             </div>
                         </div>
 
@@ -114,9 +160,17 @@ export const SaveUser = ({ user, onClose, onUserCreateSubmit }) => {
                                     name="imageUrl"
                                     type="text"
                                     defaultValue={user?.imageUrl}
+                                    onChange={(e) =>
+                                        FormValidations.validateImageUrl(
+                                            e.target.value,
+                                            setError
+                                        )
+                                    }
                                 />
                             </div>
-                            <p className="form-error">ImageUrl is not valid!</p>
+                            {error.imageUrl && (
+                                <p className="form-error">{error.imageUrl}</p>
+                            )}
                         </div>
 
                         <div className="form-row">
@@ -131,12 +185,19 @@ export const SaveUser = ({ user, onClose, onUserCreateSubmit }) => {
                                         name="country"
                                         type="text"
                                         defaultValue={user?.address.country}
+                                        onChange={(e) =>
+                                            FormValidations.validateCountry(
+                                                e.target.value,
+                                                setError
+                                            )
+                                        }
                                     />
                                 </div>
-                                <p className="form-error">
-                                    Country should be at least 2 characters
-                                    long!
-                                </p>
+                                {error.country && (
+                                    <p className="form-error">
+                                        {error.country}
+                                    </p>
+                                )}
                             </div>
                             <div className="form-group">
                                 <label htmlFor="city">City</label>
@@ -149,11 +210,17 @@ export const SaveUser = ({ user, onClose, onUserCreateSubmit }) => {
                                         name="city"
                                         type="text"
                                         defaultValue={user?.address.city}
+                                        onChange={(e) =>
+                                            FormValidations.validateCity(
+                                                e.target.value,
+                                                setError
+                                            )
+                                        }
                                     />
                                 </div>
-                                <p className="form-error">
-                                    City should be at least 3 characters long!
-                                </p>
+                                {error.city && (
+                                    <p className="form-error">{error.city}</p>
+                                )}
                             </div>
                         </div>
 
@@ -169,11 +236,17 @@ export const SaveUser = ({ user, onClose, onUserCreateSubmit }) => {
                                         name="street"
                                         type="text"
                                         defaultValue={user?.address.street}
+                                        onChange={(e) =>
+                                            FormValidations.validateStreet(
+                                                e.target.value,
+                                                setError
+                                            )
+                                        }
                                     />
                                 </div>
-                                <p className="form-error">
-                                    Street should be at least 3 characters long!
-                                </p>
+                                {error.street && (
+                                    <p className="form-error">{error.street}</p>
+                                )}
                             </div>
                             <div className="form-group">
                                 <label htmlFor="streetNumber">
@@ -190,11 +263,19 @@ export const SaveUser = ({ user, onClose, onUserCreateSubmit }) => {
                                         defaultValue={
                                             user?.address.streetNumber
                                         }
+                                        onChange={(e) =>
+                                            FormValidations.validateStreetNumber(
+                                                e.target.value,
+                                                setError
+                                            )
+                                        }
                                     />
                                 </div>
-                                <p className="form-error">
-                                    Street number should be a positive number!
-                                </p>
+                                {error.streetNumber && (
+                                    <p className="form-error">
+                                        {error.streetNumber}
+                                    </p>
+                                )}
                             </div>
                         </div>
                         <div id="form-actions">
@@ -202,6 +283,9 @@ export const SaveUser = ({ user, onClose, onUserCreateSubmit }) => {
                                 id="action-save"
                                 className="btn"
                                 type="submit"
+                                disabled={FormValidations.checkForValidationErrors(
+                                    error
+                                ) ? true : false}
                             >
                                 Save
                             </button>

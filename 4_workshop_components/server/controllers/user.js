@@ -87,6 +87,7 @@ const getUsers = async (req, res) => {
       .select('firstName lastName email imageUrl phoneNumber createdAt updatedAt')
       .limit(limit)
       .skip(skipIndex)
+      .collation({ locale: 'en' })
       .sort(sortCriteria)
       .lean();
 

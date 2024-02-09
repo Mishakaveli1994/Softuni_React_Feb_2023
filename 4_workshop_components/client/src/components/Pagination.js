@@ -1,18 +1,33 @@
-export const Pagination = () => {
+export const Pagination = ({
+    handleLimitChange,
+    handlePageChange,
+    maxPages,
+    page,
+}) => {
     return (
         <div className="pagination position">
             <div className="limits">
                 <span>Items per page:</span>
-                <select name="limit" className="limit">
+                <select
+                    name="limit"
+                    className="limit"
+                    onChange={(e) => handleLimitChange(e)}
+                >
                     <option value="5">5</option>
-                    <option value="5">10</option>
-                    <option value="5">15</option>
-                    <option value="5">20</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
                 </select>
             </div>
-            <p className="pages">1 - 1 of 1</p>
+            <p className="pages">
+                {page} - {page} of {maxPages}
+            </p>
             <div className="actions">
-                <button className="btn" title="First Page">
+                <button
+                    className="btn"
+                    title="First Page"
+                    onClick={(e) => handlePageChange(e, 'first')}
+                >
                     <svg
                         aria-hidden="true"
                         focusable="false"
@@ -30,7 +45,11 @@ export const Pagination = () => {
                     </svg>
                 </button>
 
-                <button className="btn" title="Previous Page">
+                <button
+                    className="btn"
+                    title="Previous Page"
+                    onClick={(e) => handlePageChange(e, 'prev')}
+                >
                     <svg
                         aria-hidden="true"
                         focusable="false"
@@ -47,7 +66,11 @@ export const Pagination = () => {
                         ></path>
                     </svg>
                 </button>
-                <button className="btn" title="Next Page">
+                <button
+                    className="btn"
+                    title="Next Page"
+                    onClick={(e) => handlePageChange(e, 'next')}
+                >
                     <svg
                         aria-hidden="true"
                         focusable="false"
@@ -65,7 +88,11 @@ export const Pagination = () => {
                     </svg>
                 </button>
 
-                <button className="btn" title="Last Page">
+                <button
+                    className="btn"
+                    title="Last Page"
+                    onClick={(e) => handlePageChange(e, 'last')}
+                >
                     <svg
                         aria-hidden="true"
                         focusable="false"
