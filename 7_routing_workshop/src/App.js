@@ -10,6 +10,7 @@ import { Login } from './resources/Login';
 import { Register } from './resources/Register';
 import { CreateGame } from './resources/CreateGame';
 import { GameCatalog } from './resources/GameCatalog';
+import { GameDetails } from './resources/GameDetails/GameDetails';
 
 function App() {
     const navigate = useNavigate();
@@ -48,6 +49,7 @@ function App() {
                         path="/catalog"
                         element={<GameCatalog games={games} />}
                     ></Route>
+                    <Route path="/catalog/:gameId" element={<GameDetails />} />
                 </Routes>
             </main>
             <Footer />
